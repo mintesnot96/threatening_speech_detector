@@ -1,22 +1,25 @@
 from flask import Flask, request, render_template
 from flask_cors import cross_origin
+import sklearn
 import pandas as pd
 import keras
 import pickle
+from keras.models import Model
+from keras.layers import LSTM, Activation, Dense, Dropout, Input, Embedding,SpatialDropout1D
+from tensorflow.keras.optimizers import RMSprop
+from keras.preprocessing.text import Tokenizer
+# from keras.preprocessing import sequence
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+from tensorflow.keras.utils import to_categorical
+from keras.callbacks import EarlyStopping
+from keras.models import Sequential
 import re
+# from nltk.corpus import stopwords
 import string
 import nltk
-nltk.download('stopwords')
-from nltk.corpus import stopwords
 stemmer = nltk.SnowballStemmer("english")
-stopword=set(stopwords.words('english'))
-
-nltk.download('stopwords')
-# print(nltk.data.path)
-
-
-
+# stopword=set(stopwords.words('english'))
 import whisper
 whisper_model = whisper.load_model("base")
 from pydub import AudioSegment
@@ -25,6 +28,7 @@ import os
 import moviepy.editor as mp
 from moviepy.editor import VideoFileClip
 
+stopword={'on', 'we', 'ours', "won't", 'shouldn', 'does', 'an', "it's", 'whom', 'under', 'his', 'ain', "aren't", "weren't", 'during', "mustn't", 'should', 'won', 'some', 'further', "doesn't", "hasn't", "don't", 'shan', 'she', 'which', 'ourselves', 'of', 'our', 'all', 'their', 'each', 'weren', 'just', 'were', 'm', 'for', "needn't", "you're", 'd', 'mustn', 'as', 'her', 'over', 'very', 'theirs', 'in', 'me', 'himself', 'so', 'up', "haven't", 'with', 'above', 'mightn', 'about', 'having', 'most', 'doing', 'been', 'itself', 'isn', "mightn't", 'at', 'against', "wouldn't", 'this', 'into', 'until', 'such', 'am', 'needn', 'haven', 'ma', "shouldn't", "wasn't", 'a', 't', "couldn't", 'between', 'o', "hadn't", 'they', 'no', 'him', 'when', 'll', 'why', 'after', 're', 'wouldn', 'any', 'didn', 'y', 'can', 'too', 'from', 'that', 'own', 'both', 'other', "you'd", 'it', 'yourself', 'these', 'herself', 'if', 'through', 'where', "shan't", 'do', 'the', 'are', 'couldn', 'my', 'now', 'few', 'wasn', 'doesn', 'before', 'down', 'he', 'while', 'being', 'have', 'more', "should've", "that'll", "you've", 'again', 'did', 'hers', 'yours', 'below', 'them', 'by', 'hadn', 'i', 'themselves', 'same', 'its', 'to', 'off', 'than', 'you', 'was', 'don', "isn't", 'or', 'once', 'your', 'is', "you'll", 've', 'aren', 'who', 'hasn', 'will', 'what', 'be', 'here', 'how', 'because', 'out', 'there', 'myself', 'and', 'nor', 's', 'not', 'those', 'had', 'only', 'but', 'yourselves', "didn't", "she's", 'then', 'has'}
 
 def transcribe_audio_video(file_path):
     """
