@@ -52,7 +52,7 @@ def transcribe_audio_video(file_path):
     return result["text"]
 
 def clean_text(text):
-    print(text)
+
     text = str(text).lower()
     text = re.sub('\[.*?\]', '', text)
     text = re.sub('https?://\S+|www\.\S+', '', text)
@@ -60,7 +60,7 @@ def clean_text(text):
     text = re.sub('[%s]' % re.escape(string.punctuation), '', text)
     text = re.sub('\n', '', text)
     text = re.sub('\w*\d\w*', '', text)
-    print(text)
+    
     text = [word for word in text.split(' ') if word not in stopword]
     text=" ".join(text)
     text = [stemmer.stem(word) for word in text.split(' ')]
@@ -86,10 +86,6 @@ def predict():
     if request.method == "POST":
         file = request.files.get('file')
         if file and file.filename != '':
-            print('1 file request.files')
-            print(request.files)
-            print('1 file request.files type')
-            print(type(request.files))
             if file.filename != '':
                 with NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as tmp:
                     tmp.write(file.read())
