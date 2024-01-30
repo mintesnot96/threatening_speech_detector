@@ -1,25 +1,22 @@
 from flask import Flask, request, render_template
 from flask_cors import cross_origin
-import sklearn
 import pandas as pd
 import keras
 import pickle
-from keras.models import Model
-from keras.layers import LSTM, Activation, Dense, Dropout, Input, Embedding,SpatialDropout1D
-from tensorflow.keras.optimizers import RMSprop
-from keras.preprocessing.text import Tokenizer
-# from keras.preprocessing import sequence
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-
-from tensorflow.keras.utils import to_categorical
-from keras.callbacks import EarlyStopping
-from keras.models import Sequential
 import re
-import nltk
-stemmer = nltk.SnowballStemmer("english")
-from nltk.corpus import stopwords
 import string
+import nltk
+nltk.download('stopwords')
+from nltk.corpus import stopwords
+stemmer = nltk.SnowballStemmer("english")
 stopword=set(stopwords.words('english'))
+
+nltk.download('stopwords')
+# print(nltk.data.path)
+
+
+
 import whisper
 whisper_model = whisper.load_model("base")
 from pydub import AudioSegment
