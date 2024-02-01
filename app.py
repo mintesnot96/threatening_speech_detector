@@ -1,3 +1,4 @@
+import gc
 from flask import Flask, request, render_template
 from flask_cors import cross_origin
 import sklearn
@@ -21,7 +22,9 @@ import nltk
 stemmer = nltk.SnowballStemmer("english")
 # stopword=set(stopwords.words('english'))
 import whisper
-whisper_model = whisper.load_model("base")
+# whisper_model = whisper.load_model("base")
+
+
 from pydub import AudioSegment
 from tempfile import NamedTemporaryFile
 import os
@@ -48,7 +51,10 @@ def transcribe_audio_video(file_path):
         file_path = audio_filename
 
     # Transcribe
+    whisper_model = load_modelw()
     result = whisper_model.transcribe(file_path, fp16=False)
+    del whisper_model  # Delete the model object
+    gc.collect()
     return result["text"]
 
 def clean_text(text):
@@ -66,12 +72,34 @@ def clean_text(text):
     text = [stemmer.stem(word) for word in text.split(' ')]
     text=" ".join(text)
     return text
+# /////////newcode/////////////////////////////////
+# Cache the loading of the Whisper model
+#@profile
+# @st.cache_data(ttl=24*3600)
+def load_modelw():
+    return whisper.load_model("base")
+# whisper_model = load_modelw()
 
+# Cache the loading of the threat detection model
+#@profile
+# @st.cache_data(ttl=24*3600)
+def load_modelt():
+    return keras.models.load_model("./threat_detector_model.h5")
+# threat_model = load_modelt()
+
+# Cache the loading of the tokenizer 
+#@profile
+# @st.cache_data(ttl=24*3600)
+def load_tokenizer():
+    with open('tokenizer.pickle', 'rb') as handle:
+        load_tokenizer1 = pickle.load(handle)
+    return load_tokenizer1
+
+# ////////////////////////////////////////
 app = Flask(__name__)
-model = keras.models.load_model("./threat_detector_model.h5")
-with open('tokenizer.pickle', 'rb') as handle:
-    load_tokenizer = pickle.load(handle)
-
+# model = keras.models.load_model("./threat_detector_model.h5")
+# with open('tokenizer.pickle', 'rb') as handle:
+#     load_tokenizer = pickle.load(handle)
 
 @app.route("/")
 @cross_origin()
@@ -95,9 +123,20 @@ def predict():
                 transcription = transcribe_audio_video(tmp_filename)
 
                 threatspeech = [clean_text(transcription)]
-                seq = load_tokenizer.texts_to_sequences(threatspeech)
+                
+                loadtokenizer = load_tokenizer()
+                seq = loadtokenizer.texts_to_sequences(threatspeech)
+                del loadtokenizer  # Delete the load_tokenizer object
+                gc.collect() 
                 padded = pad_sequences(seq, maxlen=300)
-                pred = model.predict(padded)
+                
+                
+                threat_model = load_modelt()
+                pred = threat_model.predict(padded)
+                del threat_model  # Delete the model object
+                gc.collect() 
+                
+                
                 if pred<0.2:
                     
                     return render_template('home.html',prediction_text="There is no Threatening speech found!!{}".format(pred))
@@ -109,11 +148,16 @@ def predict():
         elif 'threat' in request.form:
             threatspeech = request.form["threat"]
             threatspeech = [clean_text(threatspeech)]
-            seq = load_tokenizer.texts_to_sequences(threatspeech)
+            loadtokenizer = load_tokenizer()
+            seq = loadtokenizer.texts_to_sequences(threatspeech)
+            del loadtokenizer  # Delete the load_tokenizer object
+            gc.collect() 
+            padded = pad_sequences(seq, maxlen=300)
             
-
-            paddedh = pad_sequences(seq, maxlen=300)
-            predh = model.predict(paddedh)
+            threat_model = load_modelt()
+            predh = threat_model.predict(padded)
+            del threat_model  # Delete the model object
+            gc.collect() 
             if predh<0.2:
                 return render_template('home.html',prediction_text="There is no Threatening speech found!! {}".format(predh))
             else:
