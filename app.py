@@ -9,6 +9,10 @@ from keras.models import Model
 from keras.layers import LSTM, Activation, Dense, Dropout, Input, Embedding,SpatialDropout1D
 from tensorflow.keras.optimizers import RMSprop
 from keras.preprocessing.text import Tokenizer
+import os
+from flask import Flask, send_from_directory
+
+
 # from keras.preprocessing import sequence
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
@@ -109,7 +113,6 @@ def home():
 
 @app.route("/predict", methods = ["GET", "POST"])
 @cross_origin()
-
 def predict():
     if request.method == "POST":
         file = request.files.get('file')
@@ -130,7 +133,6 @@ def predict():
                 del loadtokenizer  # Delete the load_tokenizer object
                 gc.collect() 
                 padded = pad_sequences(seq, maxlen=300)
-                
                 
                 threat_model = load_modelt()
                 pred = threat_model.predict(padded)
@@ -164,6 +166,22 @@ def predict():
             else:
                 return render_template('home.html',prediction_text=" Threatening speech found!!{}".format(predh))
     return render_template("home.html")
+
+
+
+@app.route("/download/audio")
+def download_audio():
+    # Replace 'directory' with the path to any directory containing a test file
+    return send_from_directory('threatdataset', 'threat.wav', as_attachment=True)
+
+@app.route("/download/video")
+def download_video():
+    # Serve 'tyson.mp4' from the 'threatdataset' directory
+    return  send_from_directory('threatdataset', 'tyson.mp4', as_attachment=True)
+
+
+
+
 if __name__ == "__main__":
     app.run(debug=True)
 
