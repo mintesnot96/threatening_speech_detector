@@ -124,6 +124,7 @@ def predict():
 
                 threatspeech = [clean_text(transcription)]
                 
+                
                 loadtokenizer = load_tokenizer()
                 seq = loadtokenizer.texts_to_sequences(threatspeech)
                 del loadtokenizer  # Delete the load_tokenizer object
