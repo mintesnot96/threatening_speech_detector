@@ -111,62 +111,61 @@ def home():
     return render_template("home.html")
 
 
-@app.route("/predict", methods = ["GET", "POST"])
+@app.route("/predict", methods=["GET", "POST"])
 @cross_origin()
 def predict():
     if request.method == "POST":
         file = request.files.get('file')
+        threat_text = request.form.get("threat", "").strip()
+
+        # Check if both file and text input are missing
+        if (file is None or file.filename == '') and not threat_text:
+            return render_template('home.html', prediction_text="Please upload a file or input text.")
+
         if file and file.filename != '':
-            if file.filename != '':
-                with NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as tmp:
-                    tmp.write(file.read())
-                    tmp_filename = tmp.name
+            with NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as tmp:
+                tmp.write(file.read())
+                tmp_filename = tmp.name
 
-                # Transcribe the audio/video file
-                transcription = transcribe_audio_video(tmp_filename)
+            # Transcribe the audio/video file
+            transcription = transcribe_audio_video(tmp_filename)
 
-                threatspeech = [clean_text(transcription)]
-                
-                
-                loadtokenizer = load_tokenizer()
-                seq = loadtokenizer.texts_to_sequences(threatspeech)
-                del loadtokenizer  # Delete the load_tokenizer object
-                gc.collect() 
-                padded = pad_sequences(seq, maxlen=300)
-                
-                threat_model = load_modelt()
-                pred = threat_model.predict(padded)
-                del threat_model  # Delete the model object
-                gc.collect() 
-                
-                
-                if pred<0.2:
-                    
-                    return render_template('home.html',prediction_text="There is no Threatening speech found!!{}".format(pred))
-                
-                else:
+            threatspeech = [clean_text(transcription)]
 
-                    return render_template('home.html',prediction_text=" Threatening speech found!! {}".format(pred))
- 
-        elif 'threat' in request.form:
-            threatspeech = request.form["threat"]
-            threatspeech = [clean_text(threatspeech)]
             loadtokenizer = load_tokenizer()
             seq = loadtokenizer.texts_to_sequences(threatspeech)
             del loadtokenizer  # Delete the load_tokenizer object
-            gc.collect() 
+            gc.collect()
             padded = pad_sequences(seq, maxlen=300)
-            
+
+            threat_model = load_modelt()
+            pred = threat_model.predict(padded)
+            del threat_model  # Delete the model object
+            gc.collect()
+
+            if pred < 0.2:
+                return render_template('home.html', prediction_text="There is no Threatening speech found!!{}".format(pred))
+            else:
+                return render_template('home.html', prediction_text="Threatening speech found!! {}".format(pred))
+
+        elif threat_text:
+            threatspeech = [clean_text(threat_text)]
+            loadtokenizer = load_tokenizer()
+            seq = loadtokenizer.texts_to_sequences(threatspeech)
+            del loadtokenizer  # Delete the load_tokenizer object
+            gc.collect()
+            padded = pad_sequences(seq, maxlen=300)
+
             threat_model = load_modelt()
             predh = threat_model.predict(padded)
             del threat_model  # Delete the model object
-            gc.collect() 
-            if predh<0.2:
-                return render_template('home.html',prediction_text="There is no Threatening speech found!! {}".format(predh))
+            gc.collect()
+            if predh < 0.2:
+                return render_template('home.html', prediction_text="There is no Threatening speech found!! {}".format(predh))
             else:
-                return render_template('home.html',prediction_text=" Threatening speech found!!{}".format(predh))
-    return render_template("home.html")
+                return render_template('home.html', prediction_text="Threatening speech found!!{}".format(predh))
 
+    return render_template("home.html")
 
 
 @app.route("/download/audio")
