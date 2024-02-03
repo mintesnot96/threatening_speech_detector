@@ -135,24 +135,35 @@
         </div>
     </nav>
 
-    <div class="container">
-        <div class="row">
-            <div class="col-md-8 offset-md-2 form-container">
-                <form action="/predict" method="post" enctype="multipart/form-data" id="predictionForm">
-                    <h5>Type or Paste Below</h5>
-                    <input type="text" id="threat" name="threat">
+    <div class="container mt-5">
+      <div class="row">
 
-                    <h5>Or Upload Audio/Video File</h5>
-                    <input type="file" name="file" accept="audio/*,video/*">
+          <!-- Form container column -->
+          <div class="col-md-8">
+              <div class="form-container">
+                  <form action="/predict" method="post" enctype="multipart/form-data" id="predictionForm">
+                      <h5>Type or paste text below </h5>
+                      <input type="text" id="threat" name="threat">
 
-                    <!-- Submit -->
-                    <input type="submit" value="Submit" class="btn btn-custom" id="submitBtn">
-                    <div class="loader" id="loader"></div> <!-- Spinner element -->
-                    <h3>{{ prediction_text }}</h3>
-                </form>
-            </div>
-        </div>
-    </div>
+                      <h5>Or Upload Audio/Video File</h5>
+                      <input type="file" name="file" accept="audio/*,video/*">
+
+                      <!-- Submit -->
+                      <input type="submit" value="Submit" class="btn btn-custom" id="submitBtn">
+                      <div class="loader" id="loader"></div> <!-- Spinner element -->
+                      <h3>{{ prediction_text }}</h3>
+                  </form>
+              </div>
+          </div>
+                      <!-- Download buttons column -->
+                      <div class="col-md-4">
+                        <div class="center-content">
+                            <a href="/download/audio" class="btn btn-custom mb-2">Download sample test data 1|Audio</a>
+                            <a href="/download/video" class="btn btn-custom">Download sample test data 2|Video</a>
+                        </div>
+                    </div>
+      </div>
+  </div>
     
     <script>
         document.getElementById('predictionForm').onsubmit = function() {
@@ -161,34 +172,16 @@
         };
         // Remember to handle the spinner visibility after prediction
     </script>
-    <!-- Inside the <body> tag, add download links/buttons -->
 
-      <div class="center-content">
-        <a href="/download/audio" class="btn btn-custom mb-2">Download sample test 1|Audio</a> <!-- Added mb-2 for a little margin between buttons -->
-        <a href="/download/video" class="btn btn-custom">Download sample test 2|Video</a>
-    </div>
 
 </body>
 <footer class="text-light py-3">
     <div class="container text-center">
       <p class="m-0">
-        2024 <br />
-        by Mintesnot, Hussein
+        2024 |  by Mintesnot, Hussein <br />
+
       </p>
 
-      <!-- <a
-        class="github-link"
-        href="https://github.com/mintesnot96/threatening_speech_detection/main"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        
-        <img
-          src="https://pngimg.com/uploads/github/github_PNG25.png"
-          alt="GitHub Logo"
-          style="width: 80px; height: 40px; margin-top: 0px"
-        />
-      </a> -->
     </div>
   </footer>
 </html>
