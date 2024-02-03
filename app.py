@@ -144,9 +144,9 @@ def predict():
             gc.collect()
 
             if pred < 0.2:
-                return render_template('home.html', prediction_text="There is no Threatening speech found!!{}".format(pred))
+                return render_template('home.html', prediction_text="There is no Threatening speech found!!", result_status="safe")
             else:
-                return render_template('home.html', prediction_text="Threatening speech found!! {}".format(pred))
+                return render_template('home.html', prediction_text="Threatening speech found!!", result_status="danger")
 
         elif threat_text:
             threatspeech = [clean_text(threat_text)]
@@ -161,9 +161,9 @@ def predict():
             del threat_model  # Delete the model object
             gc.collect()
             if predh < 0.2:
-                return render_template('home.html', prediction_text="There is no Threatening speech found!! {}".format(predh))
+                return render_template('home.html', prediction_text="There is no Threatening speech found!!", result_status="safe")
             else:
-                return render_template('home.html', prediction_text="Threatening speech found!!{}".format(predh))
+                return render_template('home.html', prediction_text="Threatening speech found!!", result_status="danger")
 
     return render_template("home.html")
 
@@ -177,9 +177,6 @@ def download_audio():
 def download_video():
     # Serve 'tyson.mp4' from the 'threatdataset' directory
     return  send_from_directory('threatdataset', 'tyson.mp4', as_attachment=True)
-
-
-
 
 if __name__ == "__main__":
     app.run(debug=True)
