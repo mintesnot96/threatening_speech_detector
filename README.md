@@ -13,7 +13,7 @@ The Multimodal Threatening Speech Detector is a web application designed to iden
 ## Installation
 
 ### Prerequisites
-- Python 3.8+
+- Python 3.10.9
 - Flask
 - Keras
 - TensorFlow
@@ -22,7 +22,7 @@ The Multimodal Threatening Speech Detector is a web application designed to iden
 
 ### Clone the Repository
 ```bash
-git clone https://github.com/yourgithubusername/multimodal-threat-detector.git
+git clone https://github.com/mintesnot96/threatening_speech_detector.git
 cd multimodal-threat-detector
 ```
 
