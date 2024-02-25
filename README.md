@@ -55,7 +55,10 @@ This will start the Flask server, making the web application accessible on `http
 3. Submit the input for processing. The application will display whether threatening speech was detected.
 
 ## Interface Preview
-Screenshots and GIFs showcasing the application's UI and functionality are available in the project repository.
+![Screenshot 1](screanshots/Code%20Screenshot%202024-02-25%20162143%20.png)
+![Screenshot 2](screanshots/UI1%20Screenshot%202024-02-25%20162355.png)
+![Screenshot 1](screanshots/UI%202%20Screenshot%202024-02-25%20162503.png)
+![Screenshot 2](screanshots/UI%203%20Screenshot%202024-02-25%20162645.png)
 
 ## Development and Contributions
 - The project was developed using Flask for the web application framework and Jupyter Notebook for data preprocessing and model development.
