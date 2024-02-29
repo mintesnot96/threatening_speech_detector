@@ -1,4 +1,3 @@
-
 # Multimodal Threatening Speech Detector
 
 ## Overview
